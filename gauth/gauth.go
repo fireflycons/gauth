@@ -20,11 +20,11 @@ import (
 	"github.com/creachadair/otp/otpauth"
 )
 
-// IndexNow returns the current 30-second time step, and the number of seconds
+// IndexNow returns the current 30-second time step, and the number of milliseconds
 // remaining until it ends.
 func IndexNow() (uint64, int) {
-	time := time.Now().Unix()
-	return uint64(time / 30), int(time % 30)
+	time := time.Now().UnixMilli()
+	return uint64(time / 30000), int(time % 30000)
 }
 
 // pickAlgorithm returns a constructor for the named hash function, or

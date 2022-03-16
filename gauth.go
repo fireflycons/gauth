@@ -9,6 +9,7 @@ import (
 	"strings"
 	"syscall"
 	"text/tabwriter"
+	"time"
 
 	"github.com/pcarrier/gauth/gauth"
 	"golang.org/x/crypto/ssh/terminal"
@@ -38,6 +39,12 @@ func main() {
 
 	if len(os.Args) > 1 {
 		// Argument is name of an account. Print current code directly to stdout for use in scripts
+		// To account for clock skew, delay till 0.25 sec after code change if within 0.25 sec of code changing
+		if progress > 29750 {
+			time.Sleep(time.Duration(30250-progress) * time.Millisecond)
+		} else if progress < 250 {
+			time.Sleep(time.Duration(250-progress) * time.Millisecond)
+		}
 
 		for _, url := range urls {
 			if url.Account == os.Args[1] {
@@ -65,7 +72,7 @@ func main() {
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", url.Account, prev, curr, next)
 		}
 		tw.Flush()
-		fmt.Printf("[%-29s]\n", strings.Repeat("=", progress))
+		fmt.Printf("[%-29s]\n", strings.Repeat("=", int(progress/1000)))
 	}
 }
 
