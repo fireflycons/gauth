@@ -1,17 +1,28 @@
-[![Go presubmit](https://github.com/pcarrier/gauth/workflows/Go%20presubmit/badge.svg)](https://github.com/pcarrier/gauth/actions)
+# gauth: replace Google Authenticator
 
-gauth: replace Google Authenticator
-===================================
+## Installation
 
-Installation
-------------
+If you dont have go, install it
 
-With a Go environment already set up, it should be as easy as `go get github.com/pcarrier/gauth`.
+```bash
+# Golang - Manual install as yum often lags behind
+_go_version=1.17.6
+curl -Lo golang.tar.gz "https://go.dev/dl/go$_go_version.linux-amd64.tar.gz"
+sudo tar -C /usr/lib -xzf golang.tar.gz
+pushd /usr/bin
+sudo ln -s /usr/lib/go/bin/go go
+sudo ln -s /usr/lib/go/bin/gofmt gofmt
+popd
+rm -f golang.tar.gz
+```
 
-*Eg,* with `GOPATH=$HOME/go`, it will create a binary `$HOME/go/bin/gauth`.
+Build and install `gauth` from this directory to your local bin or some other directory in your path
 
-Usage
------
+```bash
+go build -o ~/bin/gauth
+```
+
+## Usage
 
 - In web interfaces, pretend you can't read QR codes, get a secret like `hret 3ij7 kaj4 2jzg` instead.
 - Store one secret per line in `~/.config/gauth.csv`, in the format `name:secret`. For example:
@@ -25,6 +36,8 @@ Usage
 - Restrict access to your user:
 
         $ chmod 600 ~/.config/gauth.csv
+
+### Show all codes and timer bar
 
 - Run `gauth`. The progress bar indicates how far the next change is.
 
@@ -40,10 +53,20 @@ Usage
 
         $ watch -n1 gauth
 
-- Remember to keep your system clock synchronized and to **lock your computer when brewing your tea!**
+### Get a single code for use in scripts
 
-Encryption
-----------
+- Run `gauth <accountname>`
+        
+        aws sts assume-role \
+        --role-arn arn:aws:iam::123456789012:role/some-role \
+        --role-session-name my-session \
+        --serial-number arn:aws:iam::123456789012:mfa/user \
+        --token-code $(gauth AWS)
+        
+
+<span style="color: red">Remember to keep your system clock synchronized and to **lock your computer when brewing your tea!**</span>
+
+## Encryption
 
 `gauth` supports password-based encryption of `gauth.csv`. To encrypt, use:
 
@@ -61,8 +84,7 @@ Encryption
 Note that this encryption mechanism is far from ideal from a pure security standpoint.
 Please read [OpenSSL's notes on the subject](http://www.openssl.org/docs/crypto/EVP_BytesToKey.html#NOTES).
 
-Compatibility
--------------
+## Compatibility
 
 Tested with:
 
